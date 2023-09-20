@@ -4,27 +4,32 @@ const urls = [
   "https://jsonplaceholder.typicode.com/posts/3",
 ];
 
-// Function to make an HTTP request to a URL and log the response
-async function fetchAndLog(url) {
+// Function to make an HTTP request and return the response JSON
+async function fetchUrl(url) {
   try {
     const response = await fetch(url);
     if (response.ok) {
       const data = await response.json();
-      console.log(`Response from ${url}:`, data);
+      return { url, data };
     } else {
-      console.error(`Error fetching ${url}: ${response.status} - ${response.statusText}`);
+      throw new Error(`Error fetching ${url}: ${response.status} - ${response.statusText}`);
     }
   } catch (error) {
-    console.error(`Error fetching ${url}: ${error.message}`);
+    throw new Error(`Error fetching ${url}: ${error.message}`);
   }
 }
 
-// Loop through the URLs and make asynchronous requests
-async function fetchUrls() {
-  for (const url of urls) {
-    await fetchAndLog(url);
+// Function to fetch all URLs and log the responses
+async function fetchAllUrls(urls) {
+  try {
+    const responses = await Promise.all(urls.map(fetchUrl));
+    responses.forEach((response) => {
+      console.log(`Response from ${response.url}:`, response.data);
+    });
+  } catch (error) {
+    console.error(error.message);
   }
 }
 
 // Start fetching the URLs
-fetchUrls();
+fetchAllUrls(urls);
