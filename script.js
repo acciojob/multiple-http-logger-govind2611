@@ -12,10 +12,10 @@ async function fetchUrl(url) {
       const data = await response.json();
       return { url, data };
     } else {
-      throw new Error(`Error fetching ${url}: ${response.status} - ${response.statusText}`);
+      return { url, error: `Error fetching ${url}: ${response.status} - ${response.statusText}` };
     }
   } catch (error) {
-    throw new Error(`Error fetching ${url}: ${error.message}`);
+    return { url, error: `Error fetching ${url}: ${error.message}` };
   }
 }
 
@@ -24,7 +24,11 @@ async function fetchAllUrls(urls) {
   try {
     const responses = await Promise.all(urls.map(fetchUrl));
     responses.forEach((response) => {
-      console.log(`Response from ${response.url}:`, response.data);
+      if (response.error) {
+        console.error(response.error);
+      } else {
+        console.log(`Response from ${response.url}:`, response.data);
+      }
     });
   } catch (error) {
     console.error(error.message);
